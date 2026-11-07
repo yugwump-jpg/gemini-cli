@@ -1,0 +1,518 @@
+{
+ "universe": [
+  "BTC",
+  "ETH",
+  "LTC",
+  "LINK",
+  "BCH",
+  "UNI",
+  "AVAX",
+  "AAVE"
+ ],
+ "excluded": {
+  "SOL": "longest data gap 10013h"
+ },
+ "start": "2021-01-01",
+ "end": "2026-11-07",
+ "n_trials": 36,
+ "fee_per_side_est": 0.0025,
+ "slip_per_side_est": 0.0005,
+ "families": {
+  "S1 trend breakout (1D)": {
+   "in_sample": {
+    "window": "2021-01-01..2024-07-01",
+    "best_params": {
+     "n_high": 20,
+     "n_low": 10,
+     "stop_k": 3
+    },
+    "sharpe": 0.03
+   },
+   "out_of_sample_fixed": {
+    "window": "2024-07-01..2026-11-07",
+    "sharpe": -0.12
+   },
+   "walk_forward": {
+    "window": "2023-01-01..2026-11-06",
+    "sharpe": 0.13,
+    "total_return": -0.0104,
+    "max_dd": -0.4312,
+    "trades": 95,
+    "win_rate": 0.263,
+    "avg_net_trade_ret": -0.0022,
+    "deflated_sharpe_prob": 0.086,
+    "picks": [
+     {
+      "test": "2023-01-01..2023-07-01",
+      "params": {
+       "n_high": 55,
+       "n_low": 10,
+       "stop_k": 3
+      }
+     },
+     {
+      "test": "2023-07-01..2024-01-01",
+      "params": {
+       "n_high": 20,
+       "n_low": 10,
+       "stop_k": 2
+      }
+     },
+     {
+      "test": "2024-01-01..2024-07-01",
+      "params": {
+       "n_high": 20,
+       "n_low": 10,
+       "stop_k": 2
+      }
+     },
+     {
+      "test": "2024-07-01..2025-01-01",
+      "params": {
+       "n_high": 20,
+       "n_low": 10,
+       "stop_k": 2
+      }
+     },
+     {
+      "test": "2025-01-01..2025-07-01",
+      "params": {
+       "n_high": 20,
+       "n_low": 20,
+       "stop_k": 3
+      }
+     },
+     {
+      "test": "2025-07-01..2026-01-01",
+      "params": {
+       "n_high": 55,
+       "n_low": 20,
+       "stop_k": 3
+      }
+     },
+     {
+      "test": "2026-01-01..2026-07-01",
+      "params": {
+       "n_high": 55,
+       "n_low": 20,
+       "stop_k": 3
+      }
+     },
+     {
+      "test": "2026-07-01..2026-11-07",
+      "params": {
+       "n_high": 55,
+       "n_low": 20,
+       "stop_k": 3
+      }
+     }
+    ]
+   },
+   "stress_1bar_late_2x_slip": {
+    "sharpe": 0.16,
+    "total_return": 0.0211
+   },
+   "monte_carlo_1000": {
+    "median_dd": -0.2961,
+    "p95_dd": -0.4813,
+    "worst_dd": -0.626
+   },
+   "year_2022_with_final_params_in_sample": {
+    "params": {
+     "n_high": 20,
+     "n_low": 20,
+     "stop_k": 3
+    },
+    "return": -0.3701,
+    "max_dd": -0.3793
+   },
+   "final_params_for_paper": {
+    "n_high": 20,
+    "n_low": 20,
+    "stop_k": 3
+   },
+   "score": {
+    "oos_sharpe": 2,
+    "deflated_sharpe": 1,
+    "max_dd": 1,
+    "trades": 3,
+    "edge_after_costs": 4,
+    "total": 11
+   },
+   "edge_in_round_trip_costs": 2.25,
+   "qualifies": false
+  },
+  "S2 flush reversion (1h)": {
+   "in_sample": {
+    "window": "2021-01-01..2024-07-01",
+    "best_params": {
+     "z": 3.0,
+     "hold_h": 12,
+     "trend_filter": false
+    },
+    "sharpe": -0.21
+   },
+   "out_of_sample_fixed": {
+    "window": "2024-07-01..2026-11-07",
+    "sharpe": -1.29
+   },
+   "walk_forward": {
+    "window": "2023-01-01..2026-11-06",
+    "sharpe": -0.37,
+    "total_return": -0.2847,
+    "max_dd": -0.4519,
+    "trades": 236,
+    "win_rate": 0.517,
+    "avg_net_trade_ret": 0.007,
+    "deflated_sharpe_prob": 0.01,
+    "picks": [
+     {
+      "test": "2023-01-01..2023-07-01",
+      "params": {
+       "z": 3.0,
+       "hold_h": 12,
+       "trend_filter": false
+      }
+     },
+     {
+      "test": "2023-07-01..2024-01-01",
+      "params": {
+       "z": 3.0,
+       "hold_h": 12,
+       "trend_filter": false
+      }
+     },
+     {
+      "test": "2024-01-01..2024-07-01",
+      "params": {
+       "z": 3.0,
+       "hold_h": 12,
+       "trend_filter": false
+      }
+     },
+     {
+      "test": "2024-07-01..2025-01-01",
+      "params": {
+       "z": 3.0,
+       "hold_h": 12,
+       "trend_filter": false
+      }
+     },
+     {
+      "test": "2025-01-01..2025-07-01",
+      "params": {
+       "z": 3.0,
+       "hold_h": 48,
+       "trend_filter": false
+      }
+     },
+     {
+      "test": "2025-07-01..2026-01-01",
+      "params": {
+       "z": 3.0,
+       "hold_h": 12,
+       "trend_filter": true
+      }
+     },
+     {
+      "test": "2026-01-01..2026-07-01",
+      "params": {
+       "z": 3.0,
+       "hold_h": 48,
+       "trend_filter": false
+      }
+     },
+     {
+      "test": "2026-07-01..2026-11-07",
+      "params": {
+       "z": 2.5,
+       "hold_h": 48,
+       "trend_filter": true
+      }
+     }
+    ]
+   },
+   "stress_1bar_late_2x_slip": {
+    "sharpe": -0.12,
+    "total_return": -0.1268
+   },
+   "monte_carlo_1000": {
+    "median_dd": -0.3502,
+    "p95_dd": -0.5328,
+    "worst_dd": -0.6911
+   },
+   "year_2022_with_final_params_in_sample": {
+    "params": {
+     "z": 2.5,
+     "hold_h": 48,
+     "trend_filter": true
+    },
+    "return": -0.1035,
+    "max_dd": -0.1035
+   },
+   "final_params_for_paper": {
+    "z": 2.5,
+    "hold_h": 48,
+    "trend_filter": true
+   },
+   "score": {
+    "oos_sharpe": 1,
+    "deflated_sharpe": 1,
+    "max_dd": 1,
+    "trades": 5,
+    "edge_after_costs": 1,
+    "total": 9
+   },
+   "edge_in_round_trip_costs": -0.63,
+   "qualifies": false
+  },
+  "S3 volume breakout (4h)": {
+   "in_sample": {
+    "window": "2021-01-01..2024-07-01",
+    "best_params": {
+     "n_high": 90,
+     "vol_mult": 3,
+     "n_low": 20
+    },
+    "sharpe": -0.01
+   },
+   "out_of_sample_fixed": {
+    "window": "2024-07-01..2026-11-07",
+    "sharpe": -0.17
+   },
+   "walk_forward": {
+    "window": "2023-01-01..2026-11-06",
+    "sharpe": 0.34,
+    "total_return": 0.2261,
+    "max_dd": -0.3785,
+    "trades": 143,
+    "win_rate": 0.238,
+    "avg_net_trade_ret": -0.0002,
+    "deflated_sharpe_prob": 0.165,
+    "picks": [
+     {
+      "test": "2023-01-01..2023-07-01",
+      "params": {
+       "n_high": 90,
+       "vol_mult": 3,
+       "n_low": 20
+      }
+     },
+     {
+      "test": "2023-07-01..2024-01-01",
+      "params": {
+       "n_high": 90,
+       "vol_mult": 3,
+       "n_low": 20
+      }
+     },
+     {
+      "test": "2024-01-01..2024-07-01",
+      "params": {
+       "n_high": 90,
+       "vol_mult": 3,
+       "n_low": 20
+      }
+     },
+     {
+      "test": "2024-07-01..2025-01-01",
+      "params": {
+       "n_high": 90,
+       "vol_mult": 3,
+       "n_low": 10
+      }
+     },
+     {
+      "test": "2025-01-01..2025-07-01",
+      "params": {
+       "n_high": 90,
+       "vol_mult": 3,
+       "n_low": 10
+      }
+     },
+     {
+      "test": "2025-07-01..2026-01-01",
+      "params": {
+       "n_high": 90,
+       "vol_mult": 3,
+       "n_low": 10
+      }
+     },
+     {
+      "test": "2026-01-01..2026-07-01",
+      "params": {
+       "n_high": 90,
+       "vol_mult": 3,
+       "n_low": 10
+      }
+     },
+     {
+      "test": "2026-07-01..2026-11-07",
+      "params": {
+       "n_high": 30,
+       "vol_mult": 2,
+       "n_low": 20
+      }
+     }
+    ]
+   },
+   "stress_1bar_late_2x_slip": {
+    "sharpe": 0.53,
+    "total_return": 0.4932
+   },
+   "monte_carlo_1000": {
+    "median_dd": -0.402,
+    "p95_dd": -0.6215,
+    "worst_dd": -0.7823
+   },
+   "year_2022_with_final_params_in_sample": {
+    "params": {
+     "n_high": 30,
+     "vol_mult": 2,
+     "n_low": 20
+    },
+    "return": -0.3911,
+    "max_dd": -0.4884
+   },
+   "final_params_for_paper": {
+    "n_high": 30,
+    "vol_mult": 2,
+    "n_low": 20
+   },
+   "score": {
+    "oos_sharpe": 2,
+    "deflated_sharpe": 1,
+    "max_dd": 2,
+    "trades": 4,
+    "edge_after_costs": 3,
+    "total": 12
+   },
+   "edge_in_round_trip_costs": 1.04,
+   "qualifies": false
+  },
+  "S4 RS rotation (1W)": {
+   "in_sample": {
+    "window": "2021-01-01..2024-07-01",
+    "best_params": {
+     "lookback": 56,
+     "top_k": 1,
+     "sma": 100
+    },
+    "sharpe": 0.21
+   },
+   "out_of_sample_fixed": {
+    "window": "2024-07-01..2026-11-07",
+    "sharpe": -0.22
+   },
+   "walk_forward": {
+    "window": "2023-01-01..2026-11-06",
+    "sharpe": 0.5,
+    "total_return": 0.1702,
+    "max_dd": -0.1564,
+    "trades": 65,
+    "win_rate": 0.4,
+    "avg_net_trade_ret": 0.0186,
+    "deflated_sharpe_prob": 0.25,
+    "picks": [
+     {
+      "test": "2023-01-01..2023-07-01",
+      "params": {
+       "lookback": 28,
+       "top_k": 1,
+       "sma": 100
+      }
+     },
+     {
+      "test": "2023-07-01..2024-01-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "sma": 100
+      }
+     },
+     {
+      "test": "2024-01-01..2024-07-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "sma": 100
+      }
+     },
+     {
+      "test": "2024-07-01..2025-01-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "sma": 100
+      }
+     },
+     {
+      "test": "2025-01-01..2025-07-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "sma": 100
+      }
+     },
+     {
+      "test": "2025-07-01..2026-01-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "sma": 100
+      }
+     },
+     {
+      "test": "2026-01-01..2026-07-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "sma": 100
+      }
+     },
+     {
+      "test": "2026-07-01..2026-11-07",
+      "params": {
+       "lookback": 56,
+       "top_k": 2,
+       "sma": 100
+      }
+     }
+    ]
+   },
+   "stress_1bar_late_2x_slip": {
+    "sharpe": 0.44,
+    "total_return": 0.1471
+   },
+   "monte_carlo_1000": {
+    "median_dd": -0.1075,
+    "p95_dd": -0.2135,
+    "worst_dd": -0.3291
+   },
+   "year_2022_with_final_params_in_sample": {
+    "params": {
+     "lookback": 56,
+     "top_k": 2,
+     "sma": 100
+    },
+    "return": -0.1603,
+    "max_dd": -0.1725
+   },
+   "final_params_for_paper": {
+    "lookback": 56,
+    "top_k": 2,
+    "sma": 100
+   },
+   "score": {
+    "oos_sharpe": 2,
+    "deflated_sharpe": 1,
+    "max_dd": 4,
+    "trades": 3,
+    "edge_after_costs": 5,
+    "total": 15
+   },
+   "edge_in_round_trip_costs": 4.68,
+   "qualifies": false
+  }
+ }
+}

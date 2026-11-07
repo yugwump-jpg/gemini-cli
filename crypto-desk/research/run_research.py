@@ -100,7 +100,9 @@ def main():
         win = float(np.mean([t["ret"] > 0 for t in wf_trades])) if n else 0.0
         dsr = deflated_sharpe(wf, n_trials, sr_var)
         mc = monte_carlo_dd(wf_trades)
-        sc = score(sharpe(wf), dsr, max_dd(wf), n, avg_net / ROUND_TRIP)
+        # Edge after costs, size-weighted: net P&L per unit of round-trip cost actually paid.
+        edge = (sum(t["f"] * t["ret"] for t in wf_trades) / sum(t["f"] * ROUND_TRIP for t in wf_trades)) if n else 0.0
+        sc = score(sharpe(wf), dsr, max_dd(wf), n, edge)
         final = max(runs, key=lambda x: sharpe(window(x[1], end - pd.DateOffset(months=24), end)))
         y22 = window(final[1], pd.Timestamp("2022-01-01", tz="UTC"), pd.Timestamp("2023-01-01", tz="UTC"))
         report["families"][fam] = {
@@ -116,7 +118,8 @@ def main():
                                                        "max_dd": round(max_dd(y22), 4)},
             "final_params_for_paper": final[0],
             "score": sc,
-            "qualifies": sc["total"] >= 18 and n >= 30 and avg_net > 0,
+            "edge_in_round_trip_costs": round(edge, 2),
+            "qualifies": sc["total"] >= 18 and n >= 30 and edge > 0 and sharpe(wf) > 0,
         }
         print(fam, json.dumps(report["families"][fam]["score"]), "qualifies:", report["families"][fam]["qualifies"])
 
