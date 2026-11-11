@@ -119,7 +119,9 @@ def main():
             "final_params_for_paper": final[0],
             "score": sc,
             "edge_in_round_trip_costs": round(edge, 2),
-            "qualifies": sc["total"] >= 18 and n >= 30 and edge > 0 and sharpe(wf) > 0,
+            "qualifies": (sc["total"] >= 18 and n >= 30 and edge > 0 and sharpe(wf) > 0
+                          and not getattr(fn, "short", False)),  # hypothetical shorts can never trade
+            "hypothetical_short": bool(getattr(fn, "short", False)),
         }
         print(fam, json.dumps(report["families"][fam]["score"]), "qualifies:", report["families"][fam]["qualifies"])
 

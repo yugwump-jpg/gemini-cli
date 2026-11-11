@@ -14,7 +14,7 @@
  },
  "start": "2021-01-01",
  "end": "2026-11-11",
- "n_trials": 48,
+ "n_trials": 64,
  "fee_per_side_est": 0.0025,
  "slip_per_side_est": 0.0005,
  "families": {
@@ -140,7 +140,8 @@
     "total": 11
    },
    "edge_in_round_trip_costs": 2.25,
-   "qualifies": false
+   "qualifies": false,
+   "hypothetical_short": false
   },
   "S2 flush reversion (1h)": {
    "in_sample": {
@@ -264,7 +265,8 @@
     "total": 9
    },
    "edge_in_round_trip_costs": -0.63,
-   "qualifies": false
+   "qualifies": false,
+   "hypothetical_short": false
   },
   "S3 volume breakout (4h)": {
    "in_sample": {
@@ -388,7 +390,8 @@
     "total": 12
    },
    "edge_in_round_trip_costs": 1.04,
-   "qualifies": false
+   "qualifies": false,
+   "hypothetical_short": false
   },
   "S4 RS rotation (1W)": {
    "in_sample": {
@@ -512,7 +515,8 @@
     "total": 15
    },
    "edge_in_round_trip_costs": 4.39,
-   "qualifies": false
+   "qualifies": false,
+   "hypothetical_short": false
   },
   "S5 snatch and sell (1h)": {
    "in_sample": {
@@ -636,7 +640,258 @@
     "total": 9
    },
    "edge_in_round_trip_costs": -1.09,
-   "qualifies": false
+   "qualifies": false,
+   "hypothetical_short": false
+  },
+  "S6 HYPOTHETICAL short the bounce (1h)": {
+   "in_sample": {
+    "window": "2021-01-01..2024-07-01",
+    "best_params": {
+     "sma_days": 50,
+     "z": 2.5,
+     "hold_h": 72
+    },
+    "sharpe": -0.65
+   },
+   "out_of_sample_fixed": {
+    "window": "2024-07-01..2026-11-11",
+    "sharpe": -1.08
+   },
+   "walk_forward": {
+    "window": "2023-01-01..2026-11-10",
+    "sharpe": -1.25,
+    "total_return": -0.5089,
+    "max_dd": -0.5365,
+    "trades": 119,
+    "win_rate": 0.353,
+    "avg_net_trade_ret": -0.0503,
+    "deflated_sharpe_prob": 0.0,
+    "picks": [
+     {
+      "test": "2023-01-01..2023-07-01",
+      "params": {
+       "sma_days": 50,
+       "z": 2.5,
+       "hold_h": 72
+      }
+     },
+     {
+      "test": "2023-07-01..2024-01-01",
+      "params": {
+       "sma_days": 50,
+       "z": 2.5,
+       "hold_h": 24
+      }
+     },
+     {
+      "test": "2024-01-01..2024-07-01",
+      "params": {
+       "sma_days": 50,
+       "z": 2.5,
+       "hold_h": 24
+      }
+     },
+     {
+      "test": "2024-07-01..2025-01-01",
+      "params": {
+       "sma_days": 50,
+       "z": 2.5,
+       "hold_h": 24
+      }
+     },
+     {
+      "test": "2025-01-01..2025-07-01",
+      "params": {
+       "sma_days": 50,
+       "z": 2.5,
+       "hold_h": 24
+      }
+     },
+     {
+      "test": "2025-07-01..2026-01-01",
+      "params": {
+       "sma_days": 50,
+       "z": 2.5,
+       "hold_h": 24
+      }
+     },
+     {
+      "test": "2026-01-01..2026-07-01",
+      "params": {
+       "sma_days": 50,
+       "z": 2.5,
+       "hold_h": 24
+      }
+     },
+     {
+      "test": "2026-07-01..2026-11-11",
+      "params": {
+       "sma_days": 50,
+       "z": 2.5,
+       "hold_h": 24
+      }
+     }
+    ]
+   },
+   "stress_1bar_late_2x_slip": {
+    "sharpe": -0.93,
+    "total_return": -0.4088
+   },
+   "monte_carlo_1000": {
+    "median_dd": -0.5149,
+    "p95_dd": -0.6288,
+    "worst_dd": -0.7204
+   },
+   "year_2022_with_final_params_in_sample": {
+    "params": {
+     "sma_days": 50,
+     "z": 2.5,
+     "hold_h": 24
+    },
+    "return": 0.0463,
+    "max_dd": -0.1123
+   },
+   "final_params_for_paper": {
+    "sma_days": 50,
+    "z": 2.5,
+    "hold_h": 24
+   },
+   "score": {
+    "oos_sharpe": 1,
+    "deflated_sharpe": 1,
+    "max_dd": 1,
+    "trades": 4,
+    "edge_after_costs": 1,
+    "total": 8
+   },
+   "edge_in_round_trip_costs": -2.99,
+   "qualifies": false,
+   "hypothetical_short": true
+  },
+  "S7 rotation + bounce exit (1W/1D)": {
+   "in_sample": {
+    "window": "2021-01-01..2024-07-01",
+    "best_params": {
+     "lookback": 56,
+     "top_k": 1,
+     "exit_rule": "bounce_after_break"
+    },
+    "sharpe": 0.18
+   },
+   "out_of_sample_fixed": {
+    "window": "2024-07-01..2026-11-11",
+    "sharpe": -0.17
+   },
+   "walk_forward": {
+    "window": "2023-01-01..2026-11-10",
+    "sharpe": 0.35,
+    "total_return": 0.1094,
+    "max_dd": -0.1394,
+    "trades": 77,
+    "win_rate": 0.377,
+    "avg_net_trade_ret": 0.0113,
+    "deflated_sharpe_prob": 0.0,
+    "picks": [
+     {
+      "test": "2023-01-01..2023-07-01",
+      "params": {
+       "lookback": 28,
+       "top_k": 1,
+       "exit_rule": "bounce_after_break"
+      }
+     },
+     {
+      "test": "2023-07-01..2024-01-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "exit_rule": "bounce_after_break"
+      }
+     },
+     {
+      "test": "2024-01-01..2024-07-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "exit_rule": "bounce_after_break"
+      }
+     },
+     {
+      "test": "2024-07-01..2025-01-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "exit_rule": "bounce_after_break"
+      }
+     },
+     {
+      "test": "2025-01-01..2025-07-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "exit_rule": "trend_break"
+      }
+     },
+     {
+      "test": "2025-07-01..2026-01-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "exit_rule": "trend_break"
+      }
+     },
+     {
+      "test": "2026-01-01..2026-07-01",
+      "params": {
+       "lookback": 56,
+       "top_k": 1,
+       "exit_rule": "trend_break"
+      }
+     },
+     {
+      "test": "2026-07-01..2026-11-11",
+      "params": {
+       "lookback": 28,
+       "top_k": 2,
+       "exit_rule": "bounce_after_break"
+      }
+     }
+    ]
+   },
+   "stress_1bar_late_2x_slip": {
+    "sharpe": 0.16,
+    "total_return": 0.0389
+   },
+   "monte_carlo_1000": {
+    "median_dd": -0.1323,
+    "p95_dd": -0.257,
+    "worst_dd": -0.4001
+   },
+   "year_2022_with_final_params_in_sample": {
+    "params": {
+     "lookback": 56,
+     "top_k": 2,
+     "exit_rule": "trend_break"
+    },
+    "return": -0.1689,
+    "max_dd": -0.1795
+   },
+   "final_params_for_paper": {
+    "lookback": 56,
+    "top_k": 2,
+    "exit_rule": "trend_break"
+   },
+   "score": {
+    "oos_sharpe": 2,
+    "deflated_sharpe": 1,
+    "max_dd": 4,
+    "trades": 3,
+    "edge_after_costs": 4,
+    "total": 14
+   },
+   "edge_in_round_trip_costs": 2.77,
+   "qualifies": false,
+   "hypothetical_short": false
   }
  }
 }

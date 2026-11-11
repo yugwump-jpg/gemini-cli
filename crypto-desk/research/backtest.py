@@ -21,6 +21,7 @@ DATA = os.path.join(os.path.dirname(__file__), "..", "data")
 FEE = 0.0025
 SLIP = 0.0005
 RISK = 0.02
+SHORT_COST_PER_DAY = 0.0003  # estimate: borrow/funding for hypothetical shorts (~11%/yr)
 
 
 # ----------------------------------------------------------------------------- data
@@ -56,18 +57,29 @@ def atr(df, n):
 
 
 # ----------------------------------------------------------------------------- engine
-def simulate_symbol(df, entry, exit_sig, stop_dist, max_hold, delay=0, slip=SLIP, fee=FEE, tp_dist=None):
+def simulate_symbol(df, entry, exit_sig, stop_dist, max_hold, delay=0, slip=SLIP, fee=FEE, tp_dist=None, short=False):
     """Return a list of trades for one symbol.
 
     entry, exit_sig: boolean arrays decided at bar close.
     stop_dist: price distance of the stop, known at the signal bar.
     tp_dist: optional take-profit distance (same units). Stop is checked first in a bar (conservative).
+    short: HYPOTHETICAL research only (the desk can't short). Stop above entry, target below, and a
+           borrow/funding cost of SHORT_COST_PER_DAY (estimate) charged on top of fees.
     """
+    sgn = -1 if short else 1
     o, h, l, c = (df[k].to_numpy() for k in "ohlc")
     idx = df.index
     n = len(df)
     ent, ex, sd = np.asarray(entry), np.asarray(exit_sig), np.asarray(stop_dist)
     tpd = None if tp_dist is None else np.asarray(tp_dist)
+
+    def stop_hit(k, stop):
+        return l[k] <= stop if not short else h[k] >= stop
+
+    def stop_fill(k, j, stop):
+        px = stop if k == j else (min(o[k], stop) if not short else max(o[k], stop))
+        return px * (1 - sgn * slip)
+
     trades = []
     i = 0
     while i < n:
@@ -77,30 +89,30 @@ def simulate_symbol(df, entry, exit_sig, stop_dist, max_hold, delay=0, slip=SLIP
         j = i + 1 + delay
         if j >= n:
             break
-        fill = o[j] * (1 + slip)
-        stop = o[j] - sd[i]
+        fill = o[j] * (1 + sgn * slip)
+        stop = o[j] - sgn * sd[i]
         if stop <= 0:
             i += 1
             continue
-        tp = o[j] + tpd[i] if tpd is not None and np.isfinite(tpd[i]) else np.inf
+        has_tp = tpd is not None and np.isfinite(tpd[i])
+        tp = o[j] + sgn * tpd[i] if has_tp else None
         k, exit_px, reason = j, None, None
         while k < n:
-            if l[k] <= stop:
-                exit_px = min(o[k], stop) * (1 - slip) if k > j else stop * (1 - slip)
-                reason = "stop"
+            if stop_hit(k, stop):
+                exit_px, reason = stop_fill(k, j, stop), "stop"
                 break
-            if h[k] >= tp:
-                exit_px = (max(o[k], tp) if k > j else tp) * (1 - slip)
-                reason = "target"
+            if has_tp and (h[k] >= tp if not short else l[k] <= tp):
+                px = tp if k == j else (max(o[k], tp) if not short else min(o[k], tp))
+                exit_px, reason = px * (1 - sgn * slip), "target"
                 break
             if (ex[k] or k - j + 1 >= max_hold) and k + 1 + delay < n:
                 k_out = k + 1 + delay
-                exit_px = o[k_out] * (1 - slip)
+                exit_px = o[k_out] * (1 - sgn * slip)
                 reason = "signal" if ex[k] else "time"
                 # Bars k+1..k_out-1 can still hit the stop while we wait (delay > 0).
                 for m in range(k + 1, k_out):
-                    if l[m] <= stop:
-                        exit_px, k_out, reason = min(o[m], stop) * (1 - slip), m, "stop"
+                    if stop_hit(m, stop):
+                        exit_px, k_out, reason = stop_fill(m, j, stop), m, "stop"
                         break
                 k = k_out
                 break
@@ -109,11 +121,18 @@ def simulate_symbol(df, entry, exit_sig, stop_dist, max_hold, delay=0, slip=SLIP
             k, exit_px, reason = n - 1, c[n - 1], "open"
         # Bar-by-bar return path from fill to exit, fees charged on entry and exit bars.
         path_px = np.concatenate([[fill], c[j:k], [exit_px]])
-        bar_ret = path_px[1:] / path_px[:-1] - 1
+        if not short:
+            bar_ret = path_px[1:] / path_px[:-1] - 1
+            net = exit_px * (1 - fee) / (fill * (1 + fee)) - 1
+        else:
+            bar_ret = -(path_px[1:] - path_px[:-1]) / fill
+            days = (idx[k] - idx[j]) / pd.Timedelta(days=1)
+            carry = SHORT_COST_PER_DAY * days
+            bar_ret[-1] -= carry
+            net = (fill * (1 - fee) - exit_px * (1 + fee)) / fill - carry
         bar_ret[0] -= fee
         bar_ret[-1] -= fee
-        net = exit_px * (1 - fee) / (fill * (1 + fee)) - 1
-        risk_pct = (fill - stop) / fill + 2 * (fee + slip)
+        risk_pct = abs(fill - stop) / fill + 2 * (fee + slip)
         trades.append({
             "entry_t": idx[j], "exit_t": idx[k], "f": min(1.0, RISK / risk_pct),
             "ret": net, "reason": reason, "bar_t": idx[j:k + 1], "bar_ret": bar_ret,
@@ -142,7 +161,8 @@ def portfolio(trades_by_symbol):
 def run(strategy, params, data, delay=0, slip=SLIP):
     """strategy(df_by_symbol, **params) -> {symbol: (df, entry, exit, stop_dist, max_hold)}"""
     sigs = strategy(data, **params)
-    tbs = {s: simulate_symbol(*v[:5], delay=delay, slip=slip, tp_dist=v[5] if len(v) > 5 else None)
+    short = getattr(strategy, "short", False)
+    tbs = {s: simulate_symbol(*v[:5], delay=delay, slip=slip, tp_dist=v[5] if len(v) > 5 else None, short=short)
            for s, v in sigs.items()}
     return portfolio(tbs)
 

@@ -94,6 +94,41 @@ def snatch_and_sell(data, entry_mode, target, max_hold_h):
     return out
 
 
+def short_bounce(data, sma_days, z, hold_h):
+    """S6 HYPOTHETICAL - short the bounce in a downtrend. The desk can't short (spot only, Desk Rules),
+    so this is research only and can never qualify. Answers: do downtrend rallies fade enough to pay costs?
+    Other side: dip buyers and trapped longs selling into the bounce."""
+    out = {}
+    for s, df in data.items():
+        r1 = np.log(df["c"]).diff()
+        vol24 = r1.rolling(24 * 30).std().shift(1) * np.sqrt(24)
+        down = df["c"] < df["c"].rolling(24 * sma_days).mean()
+        bounce = np.log(df["c"] / df["c"].shift(24)) > z * vol24
+        a = atr(df, 24)
+        no_exit = np.zeros(len(df), dtype=bool)
+        out[s] = (df, (down & bounce).fillna(False).to_numpy(), no_exit, (3 * a).to_numpy(), hold_h)
+    return out
+
+
+short_bounce.short = True
+
+
+def rotation_bounce_exit(data, lookback, top_k, exit_rule, sma=100):
+    """S7 Weekly rotation (as S4) plus a daily exit when the coin's trend breaks.
+    trend_break: sell the day after a close below its 100-day average.
+    bounce_after_break: once below the average, wait for the first up-day close and sell into that bounce.
+    Other side: bounce sellers (we sell into their rally instead of after the next leg down)."""
+    out = rs_rotation(data, lookback, top_k, sma)
+    for s, (df, entry, exit_, sd, mh) in out.items():
+        below = df["c"] < df["c"].rolling(sma).mean()
+        if exit_rule == "trend_break":
+            extra = below
+        else:
+            extra = below & below.shift(1, fill_value=False) & (df["c"] > df["c"].shift(1))
+        out[s] = (df, entry, exit_ | extra.fillna(False).to_numpy(), sd, mh)
+    return out
+
+
 GRIDS = {
     "S1 trend breakout (1D)": (trend_breakout, {"n_high": [20, 55], "n_low": [10, 20], "stop_k": [2, 3]}),
     "S2 flush reversion (1h)": (flush_reversion, {"z": [2.0, 2.5, 3.0], "hold_h": [12, 48], "trend_filter": [False, True]}),
@@ -101,6 +136,9 @@ GRIDS = {
     "S4 RS rotation (1W)": (rs_rotation, {"lookback": [28, 56], "top_k": [1, 2], "sma": [50, 100]}),
     "S5 snatch and sell (1h)": (snatch_and_sell, {"entry_mode": ["dip", "pop"], "target": [0.01, 0.02, 0.03],
                                                   "max_hold_h": [6, 24]}),
+    "S6 HYPOTHETICAL short the bounce (1h)": (short_bounce, {"sma_days": [50, 100], "z": [1.5, 2.5], "hold_h": [24, 72]}),
+    "S7 rotation + bounce exit (1W/1D)": (rotation_bounce_exit, {"lookback": [28, 56], "top_k": [1, 2],
+                                                                  "exit_rule": ["trend_break", "bounce_after_break"]}),
 }
 
 
