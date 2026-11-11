@@ -56,16 +56,18 @@ def atr(df, n):
 
 
 # ----------------------------------------------------------------------------- engine
-def simulate_symbol(df, entry, exit_sig, stop_dist, max_hold, delay=0, slip=SLIP, fee=FEE):
+def simulate_symbol(df, entry, exit_sig, stop_dist, max_hold, delay=0, slip=SLIP, fee=FEE, tp_dist=None):
     """Return a list of trades for one symbol.
 
     entry, exit_sig: boolean arrays decided at bar close.
     stop_dist: price distance of the stop, known at the signal bar.
+    tp_dist: optional take-profit distance (same units). Stop is checked first in a bar (conservative).
     """
     o, h, l, c = (df[k].to_numpy() for k in "ohlc")
     idx = df.index
     n = len(df)
     ent, ex, sd = np.asarray(entry), np.asarray(exit_sig), np.asarray(stop_dist)
+    tpd = None if tp_dist is None else np.asarray(tp_dist)
     trades = []
     i = 0
     while i < n:
@@ -80,11 +82,16 @@ def simulate_symbol(df, entry, exit_sig, stop_dist, max_hold, delay=0, slip=SLIP
         if stop <= 0:
             i += 1
             continue
+        tp = o[j] + tpd[i] if tpd is not None and np.isfinite(tpd[i]) else np.inf
         k, exit_px, reason = j, None, None
         while k < n:
             if l[k] <= stop:
                 exit_px = min(o[k], stop) * (1 - slip) if k > j else stop * (1 - slip)
                 reason = "stop"
+                break
+            if h[k] >= tp:
+                exit_px = (max(o[k], tp) if k > j else tp) * (1 - slip)
+                reason = "target"
                 break
             if (ex[k] or k - j + 1 >= max_hold) and k + 1 + delay < n:
                 k_out = k + 1 + delay
@@ -135,7 +142,8 @@ def portfolio(trades_by_symbol):
 def run(strategy, params, data, delay=0, slip=SLIP):
     """strategy(df_by_symbol, **params) -> {symbol: (df, entry, exit, stop_dist, max_hold)}"""
     sigs = strategy(data, **params)
-    tbs = {s: simulate_symbol(df, e, x, sd, mh, delay=delay, slip=slip) for s, (df, e, x, sd, mh) in sigs.items()}
+    tbs = {s: simulate_symbol(*v[:5], delay=delay, slip=slip, tp_dist=v[5] if len(v) > 5 else None)
+           for s, v in sigs.items()}
     return portfolio(tbs)
 
 

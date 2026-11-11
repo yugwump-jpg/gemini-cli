@@ -74,11 +74,33 @@ def rs_rotation(data, lookback, top_k, sma):
     return out
 
 
+def snatch_and_sell(data, entry_mode, target, max_hold_h):
+    """S5 Quick in-and-out ("snatch and sell"): small profit target, equal-size stop, short time limit.
+    dip: buy after a sharp 3-hour drop (other side: panicked short-term sellers).
+    pop: buy a fresh 24h high on 2x volume (other side: late sellers / shorts squeezed).
+    Fees (~0.6% round trip, estimate) take a big bite out of a 1-3% target."""
+    out = {}
+    for s, df in data.items():
+        r1 = np.log(df["c"]).diff()
+        if entry_mode == "dip":
+            vol3 = r1.rolling(24 * 30).std().shift(1) * np.sqrt(3)
+            entry = np.log(df["c"] / df["c"].shift(3)) < -2.0 * vol3
+        else:
+            vol_avg = df["v"].rolling(24).mean().shift(1)
+            entry = (df["c"] > df["h"].rolling(24).max().shift(1)) & (df["v"] > 2 * vol_avg)
+        dist = (target * df["c"]).to_numpy()
+        no_exit = np.zeros(len(df), dtype=bool)
+        out[s] = (df, entry.fillna(False).to_numpy(), no_exit, dist, max_hold_h, dist)
+    return out
+
+
 GRIDS = {
     "S1 trend breakout (1D)": (trend_breakout, {"n_high": [20, 55], "n_low": [10, 20], "stop_k": [2, 3]}),
     "S2 flush reversion (1h)": (flush_reversion, {"z": [2.0, 2.5, 3.0], "hold_h": [12, 48], "trend_filter": [False, True]}),
     "S3 volume breakout (4h)": (volume_breakout, {"n_high": [30, 90], "vol_mult": [2, 3], "n_low": [10, 20]}),
     "S4 RS rotation (1W)": (rs_rotation, {"lookback": [28, 56], "top_k": [1, 2], "sma": [50, 100]}),
+    "S5 snatch and sell (1h)": (snatch_and_sell, {"entry_mode": ["dip", "pop"], "target": [0.01, 0.02, 0.03],
+                                                  "max_hold_h": [6, 24]}),
 }
 
 

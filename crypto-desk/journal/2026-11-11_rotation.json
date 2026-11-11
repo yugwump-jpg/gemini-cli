@@ -1,0 +1,68 @@
+{
+ "run_utc": "2026-11-11T04:33+00:00",
+ "mode": "DRY RUN",
+ "desk_equity": 200.0,
+ "paper_account_equity": "100000",
+ "rebalance_day": false,
+ "kill_switch": "clear",
+ "losing_streak": 0,
+ "positions": {},
+ "plan": {
+  "decision_close": "2026-11-10",
+  "momentum_56d": {
+   "AVAX": 0.1515,
+   "BCH": 0.065,
+   "UNI": 0.0472,
+   "AAVE": 0.0106,
+   "LTC": -0.0108,
+   "BTC": -0.025,
+   "LINK": -0.055,
+   "ETH": -0.1446
+  },
+  "above_100d_avg": {
+   "BTC": false,
+   "ETH": false,
+   "LTC": false,
+   "LINK": false,
+   "BCH": false,
+   "UNI": true,
+   "AVAX": false,
+   "AAVE": false
+  },
+  "hold": [
+   "UNI"
+  ],
+  "price": {
+   "BTC": 73698.0125,
+   "ETH": 2050.438,
+   "LTC": 50.6805,
+   "LINK": 10.2807,
+   "BCH": 230.815,
+   "UNI": 6.6647,
+   "AVAX": 8.367785,
+   "AAVE": 123.5
+  },
+  "atr20": {
+   "BTC": 2335.7588983566734,
+   "ETH": 93.83980000000005,
+   "LTC": 3.7031507983250007,
+   "LINK": 0.663464149525,
+   "BCH": 19.416654029799997,
+   "UNI": 0.57043460875,
+   "AVAX": 0.53488106775,
+   "AAVE": 11.148134042025
+  },
+  "stale_hours": {}
+ },
+ "actions": [
+  {
+   "action": "BUY",
+   "symbol": "UNI",
+   "notional": 15.22,
+   "size_pct": 7.6,
+   "stop": 4.9534,
+   "why": "top 2 by 56d momentum (+4.7%)"
+  }
+ ],
+ "results": []
+}

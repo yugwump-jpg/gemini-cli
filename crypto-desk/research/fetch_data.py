@@ -30,12 +30,27 @@ def fetch(symbol, timeframe="1Hour", start="2021-01-01T00:00:00Z"):
         time.sleep(0.3)
 
 
+def last_timestamp(path):
+    with open(path, "rb") as f:
+        f.seek(0, 2)
+        f.seek(max(0, f.tell() - 200))
+        return f.read().decode().strip().splitlines()[-1].split(",")[0]
+
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     for s in sys.argv[1:] or UNIVERSE:
-        bars = fetch(s)
-        with open(os.path.join(OUT, f"{s}_1h.csv"), "w") as f:
-            f.write("t,o,h,l,c,v\n")
+        path = os.path.join(OUT, f"{s}_1h.csv")
+        if os.path.exists(path):
+            # Incremental: fetch from the last saved hour onward, append only newer bars.
+            last = last_timestamp(path)
+            bars = [b for b in fetch(s, start=last) if b["t"] > last]
+            mode = "a"
+        else:
+            bars, mode = fetch(s), "w"
+        with open(path, mode) as f:
+            if mode == "w":
+                f.write("t,o,h,l,c,v\n")
             for b in bars:
                 f.write(f'{b["t"]},{b["o"]},{b["h"]},{b["l"]},{b["c"]},{b["v"]}\n')
-        print(s, len(bars), bars[0]["t"], bars[-1]["t"])
+        print(s, "new bars:", len(bars), "last:", bars[-1]["t"] if bars else "unchanged", flush=True)
